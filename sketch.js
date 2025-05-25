@@ -9,6 +9,9 @@ let hoverIndex = -1;
 
 let pairingResult = "";
 
+let startHoverTime = 0;
+let startHovering = false;
+
 function setup() {
   const canvas = createCanvas(640, 480);
   canvas.parent("sketch-holder");
@@ -29,16 +32,66 @@ function draw() {
   image(video, 0, 0, width, height);
 
   if (gameState === 0) {
-    drawMaterialSelection();
+    drawStartScreen();
   } else if (gameState === 1) {
-    drawScenePairing();
+    drawMaterialSelection();
   } else if (gameState === 2) {
+    drawScenePairing();
+  } else if (gameState === 3) {
     showFinalResult();
   }
 
   drawHandLandmarks();
 }
 
+// 新增開始畫面
+function drawStartScreen() {
+  background(30, 100, 160, 200);
+  fill(255);
+  textSize(32);
+  textAlign(CENTER);
+  text("教材配對遊戲", width / 2, height / 2 - 60);
+
+  // 畫開始按鈕
+  let btnX = width / 2 - 80;
+  let btnY = height / 2;
+  let btnW = 160;
+  let btnH = 60;
+  fill(255, 220, 100);
+  rect(btnX, btnY, btnW, btnH, 20);
+  fill(0);
+  textSize(24);
+  text("開始", width / 2, btnY + btnH / 2 + 8);
+
+  // 手指偵測
+  if (predictions.length > 0) {
+    const hand = predictions[0];
+    const indexFinger = hand.landmarks[8];
+    const x = indexFinger[0];
+    const y = indexFinger[1];
+
+    // 判斷是否在按鈕範圍
+    if (x > btnX && x < btnX + btnW && y > btnY && y < btnY + btnH) {
+      fill(255, 0, 0, 120);
+      ellipse(x, y, 24);
+      if (!startHovering) {
+        startHovering = true;
+        startHoverTime = millis();
+      } else {
+        if (millis() - startHoverTime > 1500) {
+          gameState = 1;
+          startHovering = false;
+        }
+      }
+    } else {
+      startHovering = false;
+    }
+  } else {
+    startHovering = false;
+  }
+}
+
+// 修改 drawMaterialSelection 進入下一階段
 function drawMaterialSelection() {
   textSize(20);
   fill(255, 200);
@@ -75,7 +128,7 @@ function drawMaterialSelection() {
       } else {
         if (millis() - hoverStartTime > 1500) {
           selectedMaterial = ["圖卡", "故事書", "教具"][hoverIndex];
-          gameState = 1;
+          gameState = 2;
           hoverIndex = -1; // 清空，避免延續錯誤
         }
       }
@@ -123,7 +176,7 @@ function drawScenePairing() {
         if (millis() - hoverStartTime > 1500) {
           let scenes = ["故事時間", "數學活動", "小組互動"];
           pairingResult = `你選擇將「${selectedMaterial}」用於「${scenes[hoverIndex]}」！`;
-          gameState = 2;
+          gameState = 3;
           hoverIndex = -1;
         }
       }
