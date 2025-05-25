@@ -45,6 +45,7 @@ function drawMaterialSelection() {
   textAlign(CENTER);
   text("請選擇一項教材（用手指指向一區域）", width / 2, 30);
 
+  // 畫出三個選項區塊
   noStroke();
   fill(200, 100, 100, 180);
   rect(0, 100, width / 3, 300);
@@ -64,23 +65,28 @@ function drawMaterialSelection() {
     const x = indexFinger[0];
     const y = indexFinger[1];
 
-    let currentHover = floor(map(x, 0, width, 0, 3));
+    if (y > 100 && y < 400) {
+      let currentHover = floor(map(x, 0, width, 0, 3));
+      currentHover = constrain(currentHover, 0, 2);
 
-    if (currentHover !== hoverIndex) {
-      hoverIndex = currentHover;
-      hoverStartTime = millis();
-    } else {
-      if (millis() - hoverStartTime > 2000) {
-        selectedMaterial = ["圖卡", "故事書", "教具"][hoverIndex];
-        gameState = 1;
+      if (currentHover !== hoverIndex) {
+        hoverIndex = currentHover;
+        hoverStartTime = millis();
+      } else {
+        if (millis() - hoverStartTime > 1500) {
+          selectedMaterial = ["圖卡", "故事書", "教具"][hoverIndex];
+          gameState = 1;
+          hoverIndex = -1; // 清空，避免延續錯誤
+        }
       }
-    }
 
-    fill(255, 255, 0);
-    noStroke();
-    ellipse(x, y, 20);
+      fill(255, 255, 0);
+      noStroke();
+      ellipse(x, y, 20);
+    }
   }
 }
+
 
 function drawScenePairing() {
   textSize(20);
@@ -106,23 +112,28 @@ function drawScenePairing() {
     const x = indexFinger[0];
     const y = indexFinger[1];
 
-    let currentHover = floor(map(x, 0, width, 0, 3));
+    if (y > 120 && y < 360) {
+      let currentHover = floor(map(x, 0, width, 0, 3));
+      currentHover = constrain(currentHover, 0, 2);
 
-    if (currentHover !== hoverIndex) {
-      hoverIndex = currentHover;
-      hoverStartTime = millis();
-    } else {
-      if (millis() - hoverStartTime > 2000) {
-        let scenes = ["故事時間", "數學活動", "小組互動"];
-        pairingResult = `你選擇將「${selectedMaterial}」用於「${scenes[hoverIndex]}」！`;
-        gameState = 2;
+      if (currentHover !== hoverIndex) {
+        hoverIndex = currentHover;
+        hoverStartTime = millis();
+      } else {
+        if (millis() - hoverStartTime > 1500) {
+          let scenes = ["故事時間", "數學活動", "小組互動"];
+          pairingResult = `你選擇將「${selectedMaterial}」用於「${scenes[hoverIndex]}」！`;
+          gameState = 2;
+          hoverIndex = -1;
+        }
       }
-    }
 
-    fill(0, 255, 255);
-    ellipse(x, y, 20);
+      fill(0, 255, 255);
+      ellipse(x, y, 20);
+    }
   }
 }
+
 
 function showFinalResult() {
   background(30, 100, 160);
