@@ -15,6 +15,18 @@ function setup() {
   const canvas = createCanvas(640, 480);
   canvas.parent("sketch-holder");
 
+  // 建立開始按鈕
+  startButton = createButton("開始遊戲");
+  startButton.position(width / 2 - 50, height / 2);
+  startButton.size(100, 50);
+  startButton.style('font-size', '20px');
+  startButton.mousePressed(startGame);
+}
+
+function startGame() {
+  gameStarted = true;
+  startButton.hide();
+
   video = createCapture(VIDEO);
   video.size(width, height);
   video.hide();
@@ -23,16 +35,6 @@ function setup() {
   handpose.on("predict", (results) => {
     predictions = results;
   });
-
-  // 建立開始按鈕
-  startButton = createButton("開始遊戲");
-  startButton.position(width / 2 - 40, height / 2);
-  startButton.size(100, 50);
-  startButton.style('font-size', '20px');
-  startButton.mousePressed(() => {
-    gameStarted = true;
-    startButton.hide();
-  });
 }
 
 function modelReady() {
@@ -40,18 +42,17 @@ function modelReady() {
 }
 
 function draw() {
-  image(video, 0, 0, width, height);
+  background(240);
 
   if (!gameStarted) {
-    drawFinger();
-    fill(0, 150);
-    rect(0, 0, width, height);
-    fill(255);
+    fill(0);
     textAlign(CENTER, CENTER);
     textSize(24);
-    text("請按下「開始遊戲」進入互動", width / 2, height / 2 - 60);
+    text("請按下「開始遊戲」", width / 2, height / 2 - 60);
     return;
   }
+
+  image(video, 0, 0, width, height);
 
   if (gameState === 0) {
     drawMaterialSelection();
